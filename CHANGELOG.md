@@ -7,6 +7,7 @@ This project uses a release-oriented changelog. Unreleased work is recorded unde
 ## Unreleased
 
 ### Added
+- Proposed versioned lead intake API contract covering payload validation, authentication boundary, idempotency, response semantics, and acceptance tests.
 - Initial repository documentation.
 - Proposed system architecture for n8n/PostgreSQL, workflow boundaries, deployment, security, observability, and recovery.
 - ADR-001 proposing the n8n/PostgreSQL integration boundary and deferring a separate FastAPI service.
