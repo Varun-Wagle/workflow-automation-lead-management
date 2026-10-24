@@ -7,6 +7,7 @@ This project uses a release-oriented changelog. Unreleased work is recorded unde
 ## Unreleased
 
 ### Added
+- Initial PostgreSQL migration for `schema_migrations` and the `submissions` table, plus migration workflow documentation and a rollback-safe smoke-test script (not yet executed).
 - Proposed versioned lead intake API contract covering payload validation, authentication boundary, idempotency, response semantics, and acceptance tests.
 - Initial repository documentation.
 - Proposed system architecture for n8n/PostgreSQL, workflow boundaries, deployment, security, observability, and recovery.
