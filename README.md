@@ -41,7 +41,8 @@ Technology choices will be confirmed against the requirements. This project aims
 2. [Requirements and acceptance criteria](docs/requirements.md)
 3. [AS-IS / TO-BE process design](docs/process-design.md)
 4. [Architecture and data model](docs/system-architecture.md) and [intake contract](docs/intake-contract.md)
-5. MVP implementation
+5. Initial PostgreSQL migration and database verification
+6. MVP workflow implementation
 6. Functional and failure-path testing
 7. Error handling, logging, and operational guidance
 8. Demonstration, documentation, and release
