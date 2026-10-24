@@ -127,7 +127,7 @@ Response semantics must distinguish:
 - **Client validation failure:** payload does not meet the contract.
 - **Retryable service failure:** durable registration could not be confirmed, such as a database outage.
 
-The exact HTTP status codes and response schema must be specified before implementation. A successful intake response must not imply that qualification, assignment, or email delivery has completed.
+The proposed status codes and response schema are specified in `docs/intake-contract.md`; implementation must still validate them against the deployed n8n version and database transaction boundary. A successful intake response must not imply that qualification, assignment, or email delivery has completed.
 
 ## 6. Database access and transaction strategy
 
@@ -248,4 +248,4 @@ Unit tests should cover pure normalization/scoring/assignment rules; integration
 
 This architecture operationalizes `docs/process-design.md` and `docs/data-model.md` while preserving their open policy decisions.
 
-**Next milestone:** create a versioned PostgreSQL schema migration and a minimal synthetic seed/test dataset. Before implementing, finalize the intake payload contract and initial deterministic business rules, then build and verify the database constraints in a disposable development environment.
+**Next milestone:** implement a versioned PostgreSQL migration for the intake persistence boundary, using `docs/intake-contract.md` as the contract. Verify uniqueness, fingerprint conflicts, concurrent replay, and commit-failure behavior in an isolated development database before connecting the webhook.
