@@ -2,7 +2,7 @@
 
 A portfolio project exploring how workflow automation can improve lead intake, qualification, assignment, acknowledgement, and follow-up for a fictional B2B SaaS company.
 
-> **Project status:** Discovery and requirements definition  
+> **Project status:** Design documentation drafted; implementation not started  
 > **Current release:** Not released  
 > **Scenario:** Fictional company — ApexFlow Solutions
 
@@ -38,9 +38,9 @@ Technology choices will be confirmed against the requirements. This project aims
 ## Project roadmap
 
 1. [Business case](docs/business-case.md)
-2. Requirements and acceptance criteria
-3. AS-IS / TO-BE process design
-4. Architecture and data model
+2. [Requirements and acceptance criteria](docs/requirements.md)
+3. [AS-IS / TO-BE process design](docs/process-design.md)
+4. [Architecture and data model](docs/system-architecture.md) and [intake contract](docs/intake-contract.md)
 5. MVP implementation
 6. Functional and failure-path testing
 7. Error handling, logging, and operational guidance
@@ -72,4 +72,4 @@ This is a learning and portfolio project. A successful local demonstration is no
 
 ## Current status
 
-The repository is at the business-case stage. Requirements, architecture, implementation, test results, and performance claims will be updated as they are actually completed.
+Business case, draft requirements, process design, data model, architecture, and the proposed intake contract are documented. The system is not yet implemented; schema migrations, workflows, tests, and performance claims will be updated only after they are actually completed.
