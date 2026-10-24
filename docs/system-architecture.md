@@ -248,4 +248,4 @@ Unit tests should cover pure normalization/scoring/assignment rules; integration
 
 This architecture operationalizes `docs/process-design.md` and `docs/data-model.md` while preserving their open policy decisions.
 
-**Next milestone:** implement a versioned PostgreSQL migration for the intake persistence boundary, using `docs/intake-contract.md` as the contract. Verify uniqueness, fingerprint conflicts, concurrent replay, and commit-failure behavior in an isolated development database before connecting the webhook.
+**Current implementation slice:** migration `001_create_submissions.sql` defines the initial migration ledger and intake submission table. It remains unexecuted until a disposable PostgreSQL development database is available. Next, apply and verify the migration, then test duplicate-key behavior, fingerprint validation, concurrent replay, and failure handling before connecting the webhook.
