@@ -333,4 +333,4 @@ Index selection will be validated against actual queries; additional indexes inc
 
 This design implements the *planned* data responsibilities behind FR-004–FR-008 (identity/persistence), FR-009–FR-017 (qualification/assignment), FR-018–FR-022 (communications), and FR-026–FR-027 (operational visibility), as elaborated in `docs/process-design.md`.
 
-**Next:** Architecture decision record and implementation blueprint: select the n8n-to-PostgreSQL boundary, define intake response semantics, finalize the minimum payload contract and business rules, then create versioned SQL migrations and integration tests. Do not begin provider messaging before the outbox and recovery semantics are designed.
+**Implementation note:** migration `migrations/001_create_submissions.sql` implements only the initial `submissions` persistence boundary; the remaining proposed entities are future migrations. Apply and test this migration against a disposable PostgreSQL database before implementing contacts, opportunities, or provider messaging.
