@@ -8,6 +8,7 @@ This project uses a release-oriented changelog. Unreleased work is recorded unde
 
 ### Added
 - Initial repository documentation.
+- Draft relational data model with entity relationships, constraints, transaction boundaries, and notification outbox.
 - Draft process design covering the normal lead-intake path, duplicate and ambiguity handling, assignment, notification states, failure recovery, human review, and acceptance scenarios.
 - Draft business case for the fictional ApexFlow Solutions scenario.
 - Decision log template.
