@@ -41,11 +41,13 @@ Technology choices will be confirmed against the requirements. This project aims
 2. [Requirements and acceptance criteria](docs/requirements.md)
 3. [AS-IS / TO-BE process design](docs/process-design.md)
 4. [Architecture and data model](docs/system-architecture.md) and [intake contract](docs/intake-contract.md)
-5. Initial PostgreSQL migration and database verification
-6. MVP workflow implementation
-6. Functional and failure-path testing
-7. Error handling, logging, and operational guidance
-8. Demonstration, documentation, and release
+5. Initial PostgreSQL migration and database verification — completed locally
+6. FastAPI lead-intake implementation
+7. n8n workflow implementation
+8. Functional and failure-path testing
+9. Error handling, logging, and operational guidance
+10. Demonstration, documentation, and release
+
 
 ## Scope discipline
 

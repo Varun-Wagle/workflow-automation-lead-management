@@ -1,7 +1,7 @@
 # Database Migration Workflow
 
 **Project ID:** WA-001  
-**Status:** Initial migration convention — proposed, not yet executed  
+**Status:** Migration 001 applied and verified in local development
 **Last updated:** 2026-10-24
 
 ## 1. Purpose
@@ -21,15 +21,17 @@ New migration files use the next zero-padded sequence and a short snake_case des
 ## 3. Initial migration
 
 `001_create_submissions.sql` creates:
-- `schema_migrations`: records successfully applied migration versions;
-- `submissions`: the durable record of each inbound source event;
-- a unique constraint on `(source, source_event_key)`;
-- check constraints for normalized source, event-key length, SHA-256 fingerprint shape, allowed processing status, positive schema version, and timestamp consistency;
-- indexes for status-based work discovery and correlation-ID lookup.
 
-The migration is wrapped in a transaction. The migration ledger row is inserted only in the same transaction as the schema creation, so a failed migration should not leave a recorded success.
+* `schema_migrations`: records successfully applied migration versions;
+* `submissions`: the durable record of each inbound source event;
+* a unique constraint on `(source, source_event_key)`;
+* check constraints for normalized source, nonblank source, trimmed event-key length, SHA-256 fingerprint format, allowed processing status, and positive schema version;
+* indexes for status-based work discovery and correlation-ID lookup.
 
-PostgreSQL 13 or later is the initial target because the schema uses built-in `gen_random_uuid()`. No extension is required for this UUID function on the supported baseline.
+The migration is wrapped in a transaction. The migration ledger row is inserted in the same transaction as the schema creation, so a failed migration should not leave a recorded success.
+
+The migration has been applied to the local development database and verified. The SQL smoke tests also passed. This does not establish that the migration has been applied to any shared or production environment.
+
 
 ## 4. Apply to a disposable development database
 

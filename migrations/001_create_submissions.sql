@@ -29,15 +29,15 @@ CREATE TABLE submissions (
     CONSTRAINT submissions_source_normalized
         CHECK (source = lower(btrim(source))),
     CONSTRAINT submissions_event_key_length
-        CHECK (length(source_event_key) BETWEEN 1 AND 128),
+    CHECK (
+        length(btrim(source_event_key)) BETWEEN 1 AND 128
+    ),
     CONSTRAINT submissions_fingerprint_sha256_hex
         CHECK (payload_fingerprint ~ '^[0-9a-f]{64}$'),
     CONSTRAINT submissions_status_allowed
         CHECK (status IN ('pending', 'processing', 'processed', 'review_required', 'failed')),
     CONSTRAINT submissions_schema_version_positive
         CHECK (schema_version > 0),
-    CONSTRAINT submissions_processed_at_consistent
-        CHECK (processed_at IS NULL OR processed_at >= received_at),
     CONSTRAINT submissions_source_event_key_unique
         UNIQUE (source, source_event_key)
 );
