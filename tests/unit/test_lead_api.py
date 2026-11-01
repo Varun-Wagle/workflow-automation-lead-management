@@ -411,6 +411,30 @@ def test_update_lead_priority():
     finally:
         delete_test_lead(lead_id)
 
+def create_test_lead_for_qualification():
+    """Create an isolated lead with complete qualification information."""
+    test_id = uuid4().hex[:12]
+
+    lead = Lead(
+        company_name=f"Qualification Test Company {test_id}",
+        contact_name="Test Contact",
+        email=f"qualification.{test_id}@example.com",
+        phone="9876543210",
+        industry="Manufacturing",
+        company_size="201-500",
+        location="Bhilai",
+        source="referral",
+        interested_product="Workflow Automation",
+        message="We need workflow automation for our sales operations.",
+    )
+
+    with SessionLocal() as db:
+        db.add(lead)
+        db.commit()
+        db.refresh(lead)
+
+        return str(lead.id)
+
 def test_update_lead_status():
     lead_id = create_test_lead_for_update()
 
@@ -568,6 +592,105 @@ def test_update_lead_returns_500_and_rolls_back_on_persistence_failure():
 
             assert stored_lead is not None
             assert stored_lead.priority == original_priority
+
+    finally:
+        delete_test_lead(lead_id)
+
+def test_qualify_lead_persists_rule_score_and_priority():
+    lead_id = create_test_lead_for_qualification()
+
+    try:
+        response = client.post(
+            f"/api/v1/leads/{lead_id}/qualify"
+        )
+
+        assert response.status_code == 200
+
+        result = response.json()
+
+        # Verify qualification result.
+        assert result["rule_score"] == 80
+        assert result["priority"] == "high"
+
+        # Verify scoring breakdown.
+        assert result["score_breakdown"] == {
+            "company_size": 20,
+            "industry_relevance": 25,
+            "contact_completeness": 15,
+            "location_relevance": 0,
+            "lead_source": 10,
+            "business_information": 10,
+        }
+
+        # Verify the updated lead in the response.
+        assert result["lead"]["id"] == lead_id
+        assert result["lead"]["rule_score"] == 80
+        assert result["lead"]["priority"] == "high"
+        assert result["lead"]["qualification_updated_at"] is not None
+
+        # Verify actual database persistence.
+        with SessionLocal() as db:
+            stored_lead = db.get(Lead, lead_id)
+
+            assert stored_lead is not None
+            assert stored_lead.rule_score == 80
+            assert stored_lead.priority == "high"
+            assert stored_lead.qualification_updated_at is not None
+
+    finally:
+        delete_test_lead(lead_id)
+
+def test_qualify_lead_returns_404_when_not_found():
+    nonexistent_id = str(uuid4())
+
+    response = client.post(
+        f"/api/v1/leads/{nonexistent_id}/qualify"
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Lead not found."
+    }
+
+def test_qualify_lead_returns_500_and_rolls_back_on_persistence_failure():
+    lead_id = create_test_lead_for_qualification()
+
+    try:
+        # Capture original database values.
+        with SessionLocal() as db:
+            original_lead = db.get(Lead, lead_id)
+
+            original_score = original_lead.rule_score
+            original_priority = original_lead.priority
+            original_timestamp = original_lead.qualification_updated_at
+
+        # Simulate database commit failure.
+        with patch(
+            "sqlalchemy.orm.Session.commit",
+            side_effect=SQLAlchemyError(
+                "Simulated database failure."
+            ),
+        ):
+            response = client.post(
+                f"/api/v1/leads/{lead_id}/qualify"
+            )
+
+        assert response.status_code == 500
+        assert response.json() == {
+            "detail": "Unable to qualify the lead at this time."
+        }
+
+        # Verify that the failed transaction did not persist changes.
+        with SessionLocal() as db:
+            stored_lead = db.get(Lead, lead_id)
+
+            assert stored_lead is not None
+            assert stored_lead.rule_score == original_score
+            assert stored_lead.priority == original_priority
+            assert (
+                stored_lead.qualification_updated_at
+                == original_timestamp
+            )
 
     finally:
         delete_test_lead(lead_id)

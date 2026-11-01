@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.exc import SQLAlchemyError
@@ -6,18 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.schemas.lead import LeadCreate, LeadResponse, LeadUpdate
-from app.services.lead_service import (
-    LeadPersistenceError,
-    create_lead,
-    get_leads,
-)
-
-from uuid import UUID
-
-logger = logging.getLogger(__name__)
-
-router = APIRouter(prefix="/leads", tags=["Leads"])
-
+from app.schemas.qualification import QualificationResponse
 from app.services.lead_service import (
     LeadPersistenceError,
     LeadUpdateError,
@@ -26,6 +16,15 @@ from app.services.lead_service import (
     get_leads,
     update_lead,
 )
+from app.services.qualification_service import (
+    QualificationPersistenceError,
+    qualify_lead,
+)
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/leads", tags=["Leads"])
+
 
 @router.post(
     "",
@@ -87,6 +86,45 @@ def list_leads_endpoint(
             detail="Unable to retrieve leads at this time.",
         ) from exc
 
+
+@router.post(
+    "/{lead_id}/qualify",
+    response_model=QualificationResponse,
+)
+def qualify_lead_endpoint(
+    lead_id: UUID,
+    db: Session = Depends(get_db),
+) -> QualificationResponse:
+    """Calculate and persist rule-based lead qualification."""
+    try:
+        qualification = qualify_lead(db, lead_id)
+
+        if qualification is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Lead not found.",
+            )
+
+        lead, result = qualification
+
+        return QualificationResponse(
+            lead=LeadResponse.model_validate(lead),
+            rule_score=result.rule_score,
+            priority=result.priority,
+            score_breakdown=result.score_breakdown,
+            missing_information=list(result.missing_information),
+            unconfigured_criteria=list(result.unconfigured_criteria),
+            unrecognized_values=list(result.unrecognized_values),
+        )
+
+    except QualificationPersistenceError as exc:
+        logger.exception("Lead qualification persistence failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to qualify the lead at this time.",
+        ) from exc
+
+
 @router.get("/{lead_id}", response_model=LeadResponse)
 def get_lead_endpoint(
     lead_id: UUID,
@@ -111,6 +149,7 @@ def get_lead_endpoint(
             detail="Unable to retrieve the lead at this time.",
         ) from exc
 
+
 @router.patch("/{lead_id}", response_model=LeadResponse)
 def update_lead_endpoint(
     lead_id: UUID,
@@ -118,7 +157,6 @@ def update_lead_endpoint(
     db: Session = Depends(get_db),
 ) -> LeadResponse:
     """Partially update an existing lead."""
-
     try:
         lead = update_lead(db, lead_id, lead_data)
 

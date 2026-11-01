@@ -91,3 +91,52 @@ def test_lead_update_accepts_partial_priority_update():
 
     assert update.priority == "high"
     assert "company_name" not in update.model_fields_set
+
+def test_lead_accepts_interested_product_and_message():
+    lead = LeadCreate(
+        company_name="Apex Industries",
+        contact_name="Rahul Sharma",
+        email="rahul@example.com",
+        interested_product="workflow_automation",
+        message="We need automation for our sales operations.",
+    )
+
+    assert lead.interested_product == "workflow_automation"
+    assert lead.message == "We need automation for our sales operations."
+
+
+def test_lead_accepts_missing_optional_qualification_fields():
+    lead = LeadCreate(
+        company_name="Apex Industries",
+        contact_name="Rahul Sharma",
+        email="rahul@example.com",
+    )
+
+    assert lead.interested_product is None
+    assert lead.message is None
+
+
+def test_lead_rejects_interested_product_over_100_characters():
+    from pydantic import ValidationError
+    import pytest
+
+    with pytest.raises(ValidationError):
+        LeadCreate(
+            company_name="Apex Industries",
+            contact_name="Rahul Sharma",
+            email="rahul@example.com",
+            interested_product="A" * 101,
+        )
+
+
+def test_lead_rejects_message_over_5000_characters():
+    from pydantic import ValidationError
+    import pytest
+
+    with pytest.raises(ValidationError):
+        LeadCreate(
+            company_name="Apex Industries",
+            contact_name="Rahul Sharma",
+            email="rahul@example.com",
+            message="A" * 5001,
+        )
