@@ -54,6 +54,10 @@ class Lead(Base):
             "ai_score IS NULL OR ai_score BETWEEN 0 AND 100",
             name="leads_ai_score_valid",
         ),
+        CheckConstraint(
+            "rule_score IS NULL OR rule_score BETWEEN 0 AND 100",
+            name="leads_rule_score_range_check",
+        ),
         Index("leads_status_created_at_idx", "status", "created_at"),
         Index("leads_priority_created_at_idx", "priority", "created_at"),
         Index("leads_location_idx", "location"),
@@ -91,6 +95,26 @@ class Lead(Base):
         String(10),
         nullable=False,
         server_default=text("'medium'"),
+    )
+
+    interested_product: Mapped[Optional[str]] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    message: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    rule_score: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    qualification_updated_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     ai_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)

@@ -24,6 +24,9 @@ class LeadCreate(BaseModel):
     company_size: str | None = Field(default=None, max_length=50)
     location: str | None = Field(default=None, max_length=150)
 
+    interested_product: str | None = Field(default=None, max_length=100)
+    message: str | None = Field(default=None, max_length=5000)
+
     source: str = Field(default="website", min_length=1, max_length=50)
 
     @model_validator(mode="after")
@@ -49,6 +52,9 @@ class LeadUpdate(BaseModel):
     industry: str | None = Field(default=None, max_length=100)
     company_size: str | None = Field(default=None, max_length=50)
     location: str | None = Field(default=None, max_length=150)
+
+    interested_product: str | None = Field(default=None, max_length=100)
+    message: str | None = Field(default=None, max_length=5000)
 
     status: LeadStatus | None = None
     priority: LeadPriority | None = None
@@ -92,10 +98,19 @@ class LeadResponse(BaseModel):
     industry: str | None
     company_size: str | None
     location: str | None
+
+    interested_product: str | None
+    message: str | None
+
     source: str
     status: LeadStatus
     priority: LeadPriority
+
+    rule_score: int | None = Field(default=None, ge=0, le=100)
+    qualification_updated_at: datetime | None
+
     ai_score: int | None = Field(default=None, ge=0, le=100)
     ai_summary: str | None
+
     created_at: datetime
     updated_at: datetime
